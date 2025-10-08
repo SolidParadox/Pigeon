@@ -991,6 +991,82 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Wrench",
+            "id": "0ce1cc95-71d8-4dad-ba43-4985dbea7a5a",
+            "actions": [
+                {
+                    "name": "PushObject",
+                    "type": "Button",
+                    "id": "8dfadf1a-bfd4-4f19-ae8f-b72f625f8e12",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "412cf4fa-5465-422b-8228-28b3c11fb750",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "PushObject",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "PigeonFlight",
+            "id": "f641bab0-19a1-4519-a3c9-d58b021ce2f4",
+            "actions": [
+                {
+                    "name": "PigeonWingFlap",
+                    "type": "Button",
+                    "id": "a3f3d2b3-77cd-4fbc-be7d-a641e1f073eb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "b39e9e43-39da-4468-af15-3acd985f1590",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "765d9342-be3b-4fa8-ba77-9cfbb71b6871",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "PigeonWingFlap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9992177-b6af-4c17-9d5a-00a84bcbdf06",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

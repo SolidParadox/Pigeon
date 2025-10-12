@@ -14,6 +14,8 @@ public class Anchor : MonoBehaviour {
     public bool SWITCH_DT;  // use deltaTime
     public bool SWITCH_RT;  // use realTimeSinceStartup
 
+    public bool SWITCH_LOR; // Linear offset is relative
+
     private float lastTime;
 
     private void Start () {
@@ -21,7 +23,12 @@ public class Anchor : MonoBehaviour {
     }
 
     void LinearInterpolation ( float t ) {
-        Vector3 target = anchor.position + linearInterpolationOffset;
+        Vector3 target = anchor.position;
+        if ( SWITCH_LOR ) {
+            target = anchor.TransformPoint ( linearInterpolationOffset );
+        } else {
+            target = anchor.position + linearInterpolationOffset;
+        }
         Vector3 delta = target - transform.position;
         delta.Scale ( BIAS_linearInterpolation );
         transform.position += delta * STR_linearInterpolation * t;

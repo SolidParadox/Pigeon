@@ -174,6 +174,7 @@ MonoBehaviour:
   angularInterpolationOffset: {x: 0, y: 0, z: 0}
   SWITCH_DT: 0
   SWITCH_RT: 0
+  SWITCH_LOR: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,11 +328,12 @@ MonoBehaviour:
   anchor: {fileID: 2124858608}
   STR_linearInterpolation: 10
   BIAS_linearInterpolation: {x: 1, y: 1, z: 1}
-  STR_angularInterpolation: 0
-  linearInterpolationOffset: {x: 15, y: 0, z: 0}
+  STR_angularInterpolation: 10
+  linearInterpolationOffset: {x: 0, y: 2, z: -10}
   angularInterpolationOffset: {x: 0, y: 0, z: 0}
   SWITCH_DT: 0
   SWITCH_RT: 0
+  SWITCH_LOR: 1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -506,19 +508,21 @@ MonoBehaviour:
   target: {x: 0, y: 0}
   rgb: {fileID: 2124858609}
   wingsStatus: 0
-  alignmentPower: {x: 0.01, y: 0}
+  alignmentPower: {x: -0.1, y: -0.1}
   characteristics:
-    glideRatio: 0.075
+    glideRatio: 0.05
     bankRatio: 0
     diveRatio: 0
-    expoDrag: 0.001
+    expoDrag: 0
     wingsDuration: 0
-    wingsPower: 1
-    prVelocityRatio: {x: 10, y: -10}
+    wingsPower: 10
+    prVelocityRatio: {x: -5, y: -10}
   prTheta: {x: 0, y: 0}
   wingTheta: 0
   deltaStatus: 0
   debugLineRenderer: {fileID: 1301593826}
+  controllerRoll: {fileID: 2112328574}
+  controllerPitch: {fileID: 845899209}
 --- !u!1 &592867108
 GameObject:
   m_ObjectHideFlags: 0
@@ -977,6 +981,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &845899207
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 845899208}
+  - component: {fileID: 845899209}
+  m_Layer: 0
+  m_Name: PID Controller Pitch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &845899208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845899207}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1988223986}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &845899209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845899207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f828224e3eec3428ecec880d0873ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PID
+  Kp: 0.3
+  Ki: 0.2
+  Kd: 0.1
+  integral: 0
+  lastError: 0
+  lastValueVelocity: 0
+  integralDecay: 0.2
 --- !u!1 &865968399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,7 +1056,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 865968399}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1010,7 +1065,7 @@ Transform:
   - {fileID: 167234954}
   - {fileID: 1988223986}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1085837954
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,6 +1129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlightDriver
   FlightCore: {fileID: 458673155}
   InputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  inControl: 0
 --- !u!1 &1301593824
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,7 +1299,7 @@ Transform:
   m_GameObject: {fileID: 1706631348}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.65}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 0.19999999, y: 0.20000002, z: 0.20000002}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1375,7 +1431,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1825458686
 Transform:
   m_ObjectHideFlags: 0
@@ -1464,7 +1520,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1853937373
 Transform:
   m_ObjectHideFlags: 0
@@ -1567,6 +1623,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 458673154}
+  - {fileID: 845899208}
+  - {fileID: 2112328573}
   m_Father: {fileID: 865968400}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1988223987
@@ -1589,6 +1647,58 @@ MonoBehaviour:
   angularInterpolationOffset: {x: 0, y: 0, z: 0}
   SWITCH_DT: 0
   SWITCH_RT: 0
+  SWITCH_LOR: 0
+--- !u!1 &2112328572
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2112328573}
+  - component: {fileID: 2112328574}
+  m_Layer: 0
+  m_Name: PID Controller Roll
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2112328573
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112328572}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1988223986}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2112328574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112328572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94f828224e3eec3428ecec880d0873ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PID
+  Kp: 0.3
+  Ki: 0.2
+  Kd: 0.1
+  integral: 0
+  lastError: 0
+  lastValueVelocity: 0
+  integralDecay: 0.2
 --- !u!1 &2124858607
 GameObject:
   m_ObjectHideFlags: 0
@@ -1634,8 +1744,8 @@ Rigidbody:
   m_GameObject: {fileID: 2124858607}
   serializedVersion: 5
   m_Mass: 10
-  m_LinearDamping: 0.9
-  m_AngularDamping: 0.9
+  m_LinearDamping: 1
+  m_AngularDamping: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

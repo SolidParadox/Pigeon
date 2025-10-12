@@ -29,6 +29,8 @@ public class FlightCore : MonoBehaviour {
 
     public LineRenderer debugLineRenderer;
 
+    public PID controllerRoll, controllerPitch;
+
     public void UpdateInputs( Vector2 pitchRoll, bool wings ) {
         if ( deltaStatus < 2 ) {
             prTheta = pitchRoll;
@@ -48,14 +50,15 @@ public class FlightCore : MonoBehaviour {
         prTheta.Scale ( characteristics.prVelocityRatio );
         rgb.AddRelativeTorque ( prTheta.y , 0 , prTheta.x , ForceMode.Force );
 
+        if ( Vector3.Dot ( rgb.transform.forward, Vector3.up ) > 0 ) {
+            
+        }
+
         if ( wingTheta ) {
-            // If grounded, should do lift off 
             rgb.AddForce ( rgb.transform.forward * characteristics.wingsPower );
         }
 
         Vector3 rv = rgb.transform.InverseTransformDirection( rgb.linearVelocity );
-
-        //Debug.Log ( rv );
 
         rv.y = ( Mathf.Abs( rv.z ) - Mathf.Abs( rv.y ) ) * characteristics.glideRatio;
         if ( rv.y > 0 && rv.z > 0 ) {
@@ -65,17 +68,34 @@ public class FlightCore : MonoBehaviour {
             rgb.AddForce ( rgb.transform.TransformDirection ( rv ) , ForceMode.VelocityChange );
         }
 
-        // Righting mechanism 
+        /*?????????????????????????????????????????????????????????????????
+          ?                       Righting mechanism                      ?
+          ?????????????????????????????????????????????????????????????????*/
+
         debugLineRenderer.SetPosition ( 0 , rgb.transform.position );
         debugLineRenderer.SetPosition ( 1 , rgb.transform.position + rgb.linearVelocity * 10 );
 
-        float pitchDelta    = Vector3.SignedAngle ( rgb.transform.forward , rgb.linearVelocity , rgb.transform.right );
-        float rollDelta     = Vector3.SignedAngle ( rgb.transform.up , Vector3.up , rgb.transform.forward );
+        Vector3 markRoll = Vector3.ProjectOnPlane( Vector3.up, rgb.transform.forward ); 
+        if ( Vector3.up == rgb.transform.forward ) {
+            markRoll = rgb.transform.up;
+        }
+        Vector3 markPitch = rgb.transform.forward;
+        if ( rgb.linearVelocity.sqrMagnitude > 0 ) {
+            markPitch = Vector3.ProjectOnPlane ( rgb.transform.InverseTransformDirection ( rgb.linearVelocity.normalized ), rgb.transform.right );
+        }
 
-        rgb.AddRelativeTorque ( pitchDelta *  alignmentPower.x, 0 , rollDelta * alignmentPower.y , ForceMode.VelocityChange );
+        float pitchDelta    = Vector3.SignedAngle ( rgb.transform.forward , markPitch , rgb.transform.right );
+        float rollDelta     = Vector3.SignedAngle ( rgb.transform.up , markRoll , rgb.transform.forward );
+
+        float pitchResult = controllerPitch.Compute ( 0 , pitchDelta );
+        float rollResult = controllerRoll.Compute ( 0, rollDelta );
+
+        Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
+
+        rgb.AddRelativeTorque ( pitchResult *  alignmentPower.x, 0, rollResult * alignmentPower.y, ForceMode.VelocityChange );
 
         rv = rgb.linearVelocity;
-        rv = rv.normalized * ( rv.magnitude * rv.magnitude ) * characteristics.expoDrag * Time.deltaTime;
+        rv = rv.normalized * ( rv.magnitude * rv.magnitude ) * characteristics.expoDrag;
         rgb.AddForce ( -rv, ForceMode.VelocityChange );
 
         deltaStatus--;

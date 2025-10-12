@@ -1041,6 +1041,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "ReleaseControl",
+                    "type": "Button",
+                    "id": "28a0a4a0-207e-43a9-b712-2c211e586f6e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1063,6 +1072,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fb7f2b6c-0b66-4da4-8bb9-9add18e6f629",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ReleaseControl",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

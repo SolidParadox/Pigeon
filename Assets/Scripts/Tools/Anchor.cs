@@ -12,20 +12,13 @@ public class Anchor : MonoBehaviour {
     public Vector3 angularInterpolationOffset;
 
     public bool SWITCH_DT;  // use deltaTime
-    public bool SWITCH_RT;  // use realTimeSinceStartup
-
     public bool SWITCH_LOR; // Linear offset is relative
-
-    private float lastTime;
-
-    private void Start () {
-        lastTime = Time.realtimeSinceStartup;
-    }
 
     void LinearInterpolation ( float t ) {
         Vector3 target = anchor.position;
         if ( SWITCH_LOR ) {
-            target = anchor.TransformPoint ( linearInterpolationOffset );
+            Quaternion angularRot = Quaternion.Euler(angularInterpolationOffset.x, angularInterpolationOffset.y, 0);
+            target = anchor.position + ( anchor.rotation * ( angularRot * linearInterpolationOffset ) );
         } else {
             target = anchor.position + linearInterpolationOffset;
         }
@@ -35,14 +28,16 @@ public class Anchor : MonoBehaviour {
     }
 
     void AngularInterpolation ( float t ) {
-        Quaternion targetRotation = Quaternion.Euler(anchor.eulerAngles + angularInterpolationOffset);
-        transform.rotation = Quaternion.Slerp ( transform.rotation , targetRotation , STR_angularInterpolation * t );
+        Quaternion targetRotation = anchor.rotation * Quaternion.Euler(angularInterpolationOffset);
+        transform.rotation = Quaternion.Slerp (
+            transform.rotation ,
+            targetRotation ,
+            STR_angularInterpolation * t
+        );
     }
 
     private void Update () {
-        float dt = SWITCH_RT ? Time.realtimeSinceStartup - lastTime :
-                  (SWITCH_DT ? Time.deltaTime : Time.fixedDeltaTime);
-        lastTime = Time.realtimeSinceStartup;
+        float dt = SWITCH_DT ? Time.deltaTime : Time.fixedDeltaTime;
 
         LinearInterpolation ( dt );
         AngularInterpolation ( dt );

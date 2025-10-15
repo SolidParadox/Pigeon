@@ -7,7 +7,10 @@ public class ImpactWrench : MonoBehaviour {
 
     public float            STR_push;
 
+    public bool toggleStatus = false;
+
     private void OnEnable () {
+        toggleStatus = false;
         InputActions.FindActionMap("Wrench").Enable();
     }
 
@@ -17,7 +20,10 @@ public class ImpactWrench : MonoBehaviour {
 
     void Update () {
         InputAction delta = InputActions.FindAction("PushObject");
-        if ( delta.WasPressedThisDynamicUpdate() ) {
+        if ( delta.WasPressedThisDynamicUpdate () ) {
+            toggleStatus = !toggleStatus;
+        }
+        if ( toggleStatus ) {
             rgb.AddForce ( rgb.transform.forward * STR_push , ForceMode.VelocityChange );
         }
     }

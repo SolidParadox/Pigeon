@@ -1050,6 +1050,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ReleaseCamera",
+                    "type": "Button",
+                    "id": "b88bd706-1be6-4d6c-9383-d1f13acd7f93",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1083,6 +1092,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "ReleaseControl",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "525f6d6a-7e98-4f22-ade5-70ac5b307170",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ReleaseCamera",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

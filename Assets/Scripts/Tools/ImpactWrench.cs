@@ -24,7 +24,7 @@ public class ImpactWrench : MonoBehaviour {
             toggleStatus = !toggleStatus;
         }
         if ( toggleStatus ) {
-            rgb.AddForce ( rgb.transform.forward * STR_push , ForceMode.VelocityChange );
+            rgb.AddForce ( rgb.transform.forward * STR_push * Time.deltaTime , ForceMode.VelocityChange );
         }
     }
 }

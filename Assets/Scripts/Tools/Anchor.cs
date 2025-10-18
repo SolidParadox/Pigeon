@@ -11,7 +11,6 @@ public class Anchor : MonoBehaviour {
     public Vector3 linearInterpolationOffset;
     public Vector3 angularInterpolationOffset;
 
-    public bool SWITCH_DT;  // use deltaTime
     public bool SWITCH_LOR; // Linear offset is relative
 
     void LinearInterpolation ( float t ) {
@@ -36,10 +35,8 @@ public class Anchor : MonoBehaviour {
         );
     }
 
-    private void Update () {
-        float dt = SWITCH_DT ? Time.deltaTime : Time.fixedDeltaTime;
-
-        LinearInterpolation ( dt );
-        AngularInterpolation ( dt );
+    private void LateUpdate () {
+        LinearInterpolation ( Time.deltaTime );
+        AngularInterpolation ( Time.deltaTime );
     }
 }

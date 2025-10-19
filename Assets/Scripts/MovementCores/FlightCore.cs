@@ -90,7 +90,7 @@ public class FlightCore : MonoBehaviour {
         float pitchResult = controllerPitch.Compute ( 0 , pitchDelta );
         float rollResult = controllerRoll.Compute ( 0, rollDelta );
 
-        Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
+        //Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
 
         rgb.AddRelativeTorque ( pitchResult *  alignmentPower.x, 0, rollResult * alignmentPower.y, ForceMode.VelocityChange );
 

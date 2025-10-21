@@ -404,15 +404,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 15, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703343932}
   - {fileID: 547041861}
   - {fileID: 1406717515}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 569445576}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
@@ -467,16 +467,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 955ce7ca5b35f3d49862d1045be4ce7b, type: 3}
+  m_Script: {fileID: 11500000, guid: 5760db70cf3e47e48baaa5afe4e2a5ba, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Anchor
-  anchor: {fileID: 2124858608}
-  STR_linearInterpolation: 15
-  BIAS_linearInterpolation: {x: 1, y: 1, z: 1}
-  STR_angularInterpolation: 15
-  linearInterpolationOffset: {x: 0, y: 2, z: -10}
-  angularInterpolationOffset: {x: 0, y: 0, z: 0}
-  SWITCH_LOR: 1
+  m_EditorClassIdentifier: Assembly-CSharp::CameraStable
 --- !u!1 &385628676
 GameObject:
   m_ObjectHideFlags: 0
@@ -841,6 +834,10 @@ MonoBehaviour:
   debugLineRenderer: {fileID: 1301593826}
   controllerRoll: {fileID: 2112328574}
   controllerPitch: {fileID: 845899209}
+  windupX: 0
+  windupZ: 0
+  pastX: 0
+  pastZ: 0
 --- !u!1 &481261719
 GameObject:
   m_ObjectHideFlags: 0
@@ -1098,6 +1095,58 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554697501}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &569445575
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 569445576}
+  - component: {fileID: 569445577}
+  m_Layer: 0
+  m_Name: Camera Rig
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &569445576
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569445575}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 15, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 330585546}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!114 &569445577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 569445575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 955ce7ca5b35f3d49862d1045be4ce7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Anchor
+  anchor: {fileID: 2124858608}
+  STR_linearInterpolation: 15
+  BIAS_linearInterpolation: {x: 1, y: 1, z: 1}
+  STR_angularInterpolation: 15
+  linearInterpolationOffset: {x: 0, y: 2, z: -10}
+  angularInterpolationOffset: {x: 0, y: 0, z: 0}
+  SWITCH_LOR: 1
 --- !u!1 &592867108
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,7 +2137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FlightDriver
   FlightCore: {fileID: 458673155}
   InputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  CameraAnchor: {fileID: 330585548}
+  CameraAnchor: {fileID: 569445577}
   inControl: 0
   cameraControl: 0
   cameraSensitivityMultiplier: {x: 5, y: 5}
@@ -3728,7 +3777,7 @@ Rigidbody:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 330585546}
+  - {fileID: 569445576}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 704798711}

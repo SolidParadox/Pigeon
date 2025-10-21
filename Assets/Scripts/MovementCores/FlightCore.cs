@@ -31,6 +31,9 @@ public class FlightCore : MonoBehaviour {
 
     public PID controllerRoll, controllerPitch;
 
+    public int windupX = 0, windupZ = 0;
+    public float pastX = 0, pastZ = 0;
+     
     public void UpdateInputs( Vector2 pitchRoll, bool wings ) {
         if ( deltaStatus < 2 ) {
             prTheta = pitchRoll;
@@ -87,8 +90,26 @@ public class FlightCore : MonoBehaviour {
         float pitchDelta    = Vector3.SignedAngle ( rgb.transform.forward , markPitch , rgb.transform.right );
         float rollDelta     = Vector3.SignedAngle ( rgb.transform.up , markRoll , rgb.transform.forward );
 
-        float pitchResult = controllerPitch.Compute ( 0 , pitchDelta );
-        float rollResult = controllerRoll.Compute ( 0, rollDelta );
+        pitchDelta += 360 * windupX;
+        if ( Mathf.Abs ( pitchDelta - pastX ) > 180 ) {
+            pitchDelta -= 360 * windupX;
+            windupX += ( pitchDelta + 360 * windupX ) < pastX ? 1 : -1;
+            pitchDelta += 360 * windupX;
+        }
+
+        rollDelta += 360 * windupZ;
+        if ( Mathf.Abs ( rollDelta - pastZ ) > 180 ) {
+            rollDelta -= 360 * windupZ;
+            windupZ += ( rollDelta + 360 * windupZ ) < pastZ ? 1 : -1;
+            rollDelta += 360 * windupZ;
+        }
+        Debug.Log ( rollDelta + " " + windupZ );
+
+        float pitchResult = controllerPitch.Compute ( 360 * windupX , pitchDelta );
+        float rollResult = controllerRoll.Compute ( 360 * windupZ, rollDelta );
+
+        pastX = pitchDelta;
+        pastZ = rollDelta;
 
         //Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
 

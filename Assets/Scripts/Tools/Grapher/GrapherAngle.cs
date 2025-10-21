@@ -25,7 +25,7 @@ public class GrapherAngle : Grapher {
         delta = pitchDelta;
         if ( axis == Axis.Z ) {
             delta = rollDelta;
-            Debug.Log ( delta + " " + pastDelta );
+            //Debug.Log ( delta + " " + pastDelta );
         }
 
         delta += 360 * whatever;
@@ -34,10 +34,9 @@ public class GrapherAngle : Grapher {
             delta -= 360 * whatever;
             whatever += ( delta + 360 * whatever ) < pastDelta ? 1 : -1;
             delta += 360 * whatever;
-            Debug.Break ();
         }
 
-        data [ index ] = delta;
+        data [ index ] = ( (int)delta + 180 ) % 360 - 180;
         pastDelta = delta;
         base.Update ();
     }

@@ -99,14 +99,22 @@ public class FlightCore : MonoBehaviour {
 
         rollDelta += 360 * windupZ;
         if ( Mathf.Abs ( rollDelta - pastZ ) > 180 ) {
+            //Debug.Log ( "WINDUP Before " + rollDelta + " PastZ : " + pastZ + " " + windupZ );
             rollDelta -= 360 * windupZ;
             windupZ += ( rollDelta + 360 * windupZ ) < pastZ ? 1 : -1;
             rollDelta += 360 * windupZ;
+            //Debug.Log ( "WINDUP After " + rollDelta + " PastZ : " + pastZ + " " + windupZ );
+            //Debug.Break ();
         }
-        Debug.Log ( rollDelta + " " + windupZ );
 
         float pitchResult = controllerPitch.Compute ( 360 * windupX , pitchDelta );
         float rollResult = controllerRoll.Compute ( 360 * windupZ, rollDelta );
+
+        float gimbalLockAngle = Vector3.Angle ( rgb.transform.forward , Vector3.up );
+        if ( gimbalLockAngle < 10 || gimbalLockAngle > 170 ) {
+            rollResult = 0;
+            controllerRoll.Reset ();
+        }
 
         pastX = pitchDelta;
         pastZ = rollDelta;

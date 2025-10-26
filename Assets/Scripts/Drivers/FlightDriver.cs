@@ -15,11 +15,14 @@ public class FlightDriver : MonoBehaviour {
     public bool cameraControl;
 
     public Vector2 cameraSensitivityMultiplier;
-    private Vector2 savedFlightInputs;
+
+    public Vector2 currentInput;
+    public float maxInput;
 
     private void OnEnable () {
         inControl = true;
         cameraControl = false;
+        currentInput = Vector2.zero;
 
         var map = InputActions.FindActionMap("PigeonFlight");
         map.Enable ();
@@ -50,17 +53,19 @@ public class FlightDriver : MonoBehaviour {
             cameraControl = releaseCamera.IsPressed ();
             if ( !cameraControl ) {
                 CameraAnchor.angularInterpolationOffset = Vector3.zero;
-            } else {
-                savedFlightInputs = lookDelta;
             }
         }
 
         if ( cameraControl ) {
             lookDelta.Scale(cameraSensitivityMultiplier );
             CameraAnchor.angularInterpolationOffset += new Vector3 ( -lookDelta.y, lookDelta.x, 0);
-            lookDelta = savedFlightInputs;
+            lookDelta = Vector2.zero;
+        }
+        currentInput += lookDelta; 
+        if ( currentInput.magnitude > maxInput ) {
+            currentInput = currentInput.normalized * maxInput;
         }
 
-        FlightCore.UpdateInputs ( lookDelta , wingsAction.IsPressed () );
+        FlightCore.UpdateInputs ( currentInput.normalized * currentInput.sqrMagnitude / maxInput , wingsAction.IsPressed () );
     }
 }

@@ -10,6 +10,7 @@ public class FlightDriver : MonoBehaviour {
     private InputAction wingsAction;
     private InputAction releaseControl;
     private InputAction releaseCamera;
+    private InputAction resetPigeon;
 
     public bool inControl;
     public bool cameraControl;
@@ -31,6 +32,7 @@ public class FlightDriver : MonoBehaviour {
         lookAction      = map.FindAction ( "Look" );
         releaseControl  = map.FindAction ( "ReleaseControl" );
         releaseCamera   = map.FindAction ( "ReleaseCamera" );
+        resetPigeon     = map.FindAction ( "ResetPigeon" );
 
         Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -44,7 +46,14 @@ public class FlightDriver : MonoBehaviour {
             inControl = !inControl;
             Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
         }
-        
+
+        if ( resetPigeon.WasPressedThisDynamicUpdate () ) {
+            FlightCore.rgb.linearVelocity = Vector3.zero;
+            FlightCore.rgb.angularVelocity = Vector3.zero;
+            FlightCore.rgb.transform.position = Vector3.zero;
+            FlightCore.rgb.transform.rotation = Quaternion.identity;
+        }
+
         if ( !inControl ) return;
         
         Vector2 lookDelta = lookAction.ReadValue<Vector2>() * Time.deltaTime;

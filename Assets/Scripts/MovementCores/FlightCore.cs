@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class FlightCore : MonoBehaviour {
     public Rigidbody    rgb;
@@ -24,13 +25,28 @@ public class FlightCore : MonoBehaviour {
 
     public LineRenderer debugLineRenderer;
 
-    public PID controllerRoll, controllerPitch;
+    public PID      controllerRoll, controllerPitch;
 
-    private int windupX = 0, windupZ = 0;
-    public float pastX = 0, pastZ = 0;
+    private int     windupX = 0, windupZ = 0;
+    public float    pastX = 0, pastZ = 0;
+
+    public float    TMRcooldown = 1;
+    protected float    OUTrebalanceCA = 1;
 
     [SerializeField]
     private AnimationCurve STRspeedWingRedirect = AnimationCurve.Linear(0, 0, 1, 1);
+    
+    IEnumerator CooldownRebalancing () {
+        float elapsed = 0f; 
+        controllerRoll.Reset(); controllerPitch.Reset();
+        while ( elapsed < TMRcooldown ) {
+            elapsed += Time.deltaTime;
+            OUTrebalanceCA = elapsed / TMRcooldown;
+            yield return null;
+        }
+        OUTrebalanceCA = 1;
+    }
+
     public void UpdateInputs ( Vector2 pitchRoll , bool wings ) {
         if ( deltaStatus < 2 ) {
             prTheta = pitchRoll;
@@ -56,8 +72,9 @@ public class FlightCore : MonoBehaviour {
         if ( wingTheta && wingThetaCatch ) {
             Vector2 horizontalSpeed = rgb.linearVelocity;
             horizontalSpeed.y = 0;
-            Vector2 targetForce = Vector3.Lerp ( Vector3.up, rgb.transform.forward, horizontalSpeed.magnitude / THRwingZtoXY );
+            Vector3 targetForce = Vector3.Lerp ( Vector3.up, rgb.transform.forward, horizontalSpeed.magnitude / THRwingZtoXY );
             rgb.AddForce ( targetForce * STRwingflap , ForceMode.Impulse );
+            StartCoroutine ( CooldownRebalancing() );
             wingThetaCatch = false;
         }
 
@@ -115,7 +132,7 @@ public class FlightCore : MonoBehaviour {
 
         //Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
 
-        rgb.AddRelativeTorque ( pitchResult * alignmentPower.y , 0 , rollResult * alignmentPower.x , ForceMode.VelocityChange );
+        rgb.AddRelativeTorque ( pitchResult * alignmentPower.y * OUTrebalanceCA , 0 , rollResult * alignmentPower.x * OUTrebalanceCA , ForceMode.VelocityChange );
 
         rv = rgb.linearVelocity;
         rv = rv.normalized * ( rv.magnitude * rv.magnitude ) * STRexpoDrag;

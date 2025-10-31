@@ -1059,6 +1059,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ResetPigeon",
+                    "type": "Button",
+                    "id": "0118572a-842d-4e80-80d8-9ac211e741dc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1103,6 +1112,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "ReleaseCamera",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dab47c91-1bd6-4b3f-be88-9be6ef74e438",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ResetPigeon",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

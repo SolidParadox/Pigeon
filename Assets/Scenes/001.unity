@@ -905,17 +905,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlightCore
   rgb: {fileID: 2124858609}
-  alignmentPower: {x: -0.001, y: -0.001}
-  controlsSensitivity: {x: -10, y: -10}
+  alignmentPower: {x: -0.01, y: -0.0005}
+  controlsSensitivity: {x: -20, y: -5}
   STRredirect: 5
   STRwingflap: 100
   THRwingZtoXY: 10
-  STRexpoDrag: 0.0001
+  STRexpoDrag: 0.001
   debugLineRenderer: {fileID: 1301593826}
   controllerRoll: {fileID: 2112328574}
   controllerPitch: {fileID: 845899209}
   pastX: 0
   pastZ: 0
+  TMRcooldown: 0.25
   STRspeedWingRedirect:
     serializedVersion: 2
     m_Curve:

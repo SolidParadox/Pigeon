@@ -1,47 +1,47 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FlightCore : MonoBehaviour {
-    public Vector2      target;
     public Rigidbody    rgb;
 
-    public float        wingsStatus;
-
-    [System.Serializable]
-    public class FlightCharacteristics {
-        public float glideRatio;
-        public float bankRatio;
-        public float diveRatio;
-        public float expoDrag;
-
-        public float wingsDuration;
-        public float wingsPower;
-
-        public Vector2 prVelocityRatio;
-    }
-
     public Vector2 alignmentPower;
-    public FlightCharacteristics characteristics;
 
-    public Vector2 prTheta;
-    public bool    wingTheta;
+    public Vector2  controlsSensitivity;
 
-    public int deltaStatus;
+    // Controls control variables ( lel )
+    private Vector2 prTheta;
+
+    // Wings control variables
+    private bool    wingTheta;
+    private bool wingThetaCatch;
+
+    private int      deltaStatus;
+    public float    STRredirect;
+
+    public float    STRwingflap;
+    public float    THRwingZtoXY;
+
+    public float    STRexpoDrag;
 
     public LineRenderer debugLineRenderer;
 
     public PID controllerRoll, controllerPitch;
 
-    public int windupX = 0, windupZ = 0;
+    private int windupX = 0, windupZ = 0;
     public float pastX = 0, pastZ = 0;
-     
-    public void UpdateInputs( Vector2 pitchRoll, bool wings ) {
+
+    [SerializeField]
+    private AnimationCurve STRspeedWingRedirect = AnimationCurve.Linear(0, 0, 1, 1);
+    public void UpdateInputs ( Vector2 pitchRoll , bool wings ) {
         if ( deltaStatus < 2 ) {
             prTheta = pitchRoll;
         } else {
             prTheta = ( prTheta + pitchRoll ) / 2;
         }
-        wingTheta |= wings;
-        deltaStatus = 2;                        
+        if ( !wingTheta && wings ) {
+            wingThetaCatch = true;
+        }
+        wingTheta = wings | wingThetaCatch;
+        deltaStatus = 2;
     }
 
     void FixedUpdate () {
@@ -50,41 +50,36 @@ public class FlightCore : MonoBehaviour {
             prTheta = Vector2.zero;
         }
 
-        prTheta.Scale ( characteristics.prVelocityRatio );
+        prTheta.Scale ( controlsSensitivity );
         rgb.AddRelativeTorque ( prTheta.y , 0 , prTheta.x , ForceMode.Force );
 
-        if ( Vector3.Dot ( rgb.transform.forward, Vector3.up ) > 0 ) {
-            
+        if ( wingTheta && wingThetaCatch ) {
+            Vector2 horizontalSpeed = rgb.linearVelocity;
+            horizontalSpeed.y = 0;
+            Vector2 targetForce = Vector3.Lerp ( Vector3.up, rgb.transform.forward, horizontalSpeed.magnitude / THRwingZtoXY );
+            rgb.AddForce ( targetForce * STRwingflap , ForceMode.Impulse );
+            wingThetaCatch = false;
         }
 
-        if ( wingTheta ) {
-            rgb.AddForce ( rgb.transform.forward * characteristics.wingsPower );
-        }
+        Vector3 rv = rgb.linearVelocity;
+        Vector3 tv = rv.magnitude * rgb.transform.forward;
 
-        Vector3 rv = rgb.transform.InverseTransformDirection( rgb.linearVelocity );
+        rgb.AddForce ( ( tv - rv ) * STRspeedWingRedirect.Evaluate ( rv.magnitude ) * STRredirect * Time.fixedDeltaTime , ForceMode.VelocityChange );
 
-        rv.y = ( Mathf.Abs( rv.z ) - Mathf.Abs( rv.y ) ) * characteristics.glideRatio;
-        if ( rv.y > 0 && rv.z > 0 ) {
-            rv.z = 0;
-            rv.x = 0;
-            rv.y *= rv.y;
-            rgb.AddForce ( rgb.transform.TransformDirection ( rv ) , ForceMode.VelocityChange );
-        }
-
-        /*?????????????????????????????????????????????????????????????????
-          ?                       Righting mechanism                      ?
-          ?????????????????????????????????????????????????????????????????*/
+        /*╔═══════════════════════════════════════════════════════════════╗
+          ║                       Righting mechanism                      ║
+          ╚═══════════════════════════════════════════════════════════════╝*/
 
         debugLineRenderer.SetPosition ( 0 , rgb.transform.position );
         debugLineRenderer.SetPosition ( 1 , rgb.transform.position + rgb.linearVelocity * 10 );
 
-        Vector3 markRoll = Vector3.ProjectOnPlane( Vector3.up, rgb.transform.forward ); 
+        Vector3 markRoll = Vector3.ProjectOnPlane( Vector3.up, rgb.transform.forward );
         if ( Vector3.up == rgb.transform.forward ) {
             markRoll = rgb.transform.up;
         }
         Vector3 markPitch = rgb.transform.forward;
         if ( rgb.linearVelocity.sqrMagnitude > 0 ) {
-            markPitch = Vector3.ProjectOnPlane ( rgb.transform.InverseTransformDirection ( rgb.linearVelocity.normalized ), rgb.transform.right );
+            markPitch = Vector3.ProjectOnPlane ( rgb.transform.InverseTransformDirection ( rgb.linearVelocity.normalized ) , rgb.transform.right );
         }
 
         float pitchDelta    = Vector3.SignedAngle ( rgb.transform.forward , markPitch , rgb.transform.right );
@@ -99,21 +94,20 @@ public class FlightCore : MonoBehaviour {
 
         rollDelta += 360 * windupZ;
         if ( Mathf.Abs ( rollDelta - pastZ ) > 180 ) {
-            //Debug.Log ( "WINDUP Before " + rollDelta + " PastZ : " + pastZ + " " + windupZ );
             rollDelta -= 360 * windupZ;
             windupZ += ( rollDelta + 360 * windupZ ) < pastZ ? 1 : -1;
             rollDelta += 360 * windupZ;
-            //Debug.Log ( "WINDUP After " + rollDelta + " PastZ : " + pastZ + " " + windupZ );
-            //Debug.Break ();
         }
 
         float pitchResult = controllerPitch.Compute ( 360 * windupX , pitchDelta );
         float rollResult = controllerRoll.Compute ( 360 * windupZ, rollDelta );
 
         float gimbalLockAngle = Vector3.Angle ( rgb.transform.forward , Vector3.up );
+
         if ( gimbalLockAngle < 10 || gimbalLockAngle > 170 ) {
             rollResult = 0;
             controllerRoll.Reset ();
+            Debug.Log ( "RESET!" );
         }
 
         pastX = pitchDelta;
@@ -121,11 +115,11 @@ public class FlightCore : MonoBehaviour {
 
         //Debug.Log( rgb.angularVelocity + " " + rgb.transform.TransformDirection ( rgb.angularVelocity ) + " " + rollDelta + " " + rollResult);
 
-        rgb.AddRelativeTorque ( pitchResult *  alignmentPower.x, 0, rollResult * alignmentPower.y, ForceMode.VelocityChange );
+        rgb.AddRelativeTorque ( pitchResult * alignmentPower.y , 0 , rollResult * alignmentPower.x , ForceMode.VelocityChange );
 
         rv = rgb.linearVelocity;
-        rv = rv.normalized * ( rv.magnitude * rv.magnitude ) * characteristics.expoDrag;
-        rgb.AddForce ( -rv, ForceMode.VelocityChange );
+        rv = rv.normalized * ( rv.magnitude * rv.magnitude ) * STRexpoDrag;
+        rgb.AddForce ( -rv , ForceMode.VelocityChange );
 
         deltaStatus--;
     }

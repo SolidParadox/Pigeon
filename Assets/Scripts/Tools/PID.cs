@@ -32,6 +32,8 @@ public class PID : MonoBehaviour {
 
         lastError = error;
 
+        if ( enabled ) Debug.Log ( integral );
+
         return Kp * error + Ki * integral + Kd * derivative;
     }
 

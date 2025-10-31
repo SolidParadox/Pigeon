@@ -66,6 +66,6 @@ public class FlightDriver : MonoBehaviour {
             currentInput = currentInput.normalized * maxInput;
         }
 
-        FlightCore.UpdateInputs ( currentInput.normalized * currentInput.sqrMagnitude / maxInput , wingsAction.IsPressed () );
+        FlightCore.UpdateInputs ( Quaternion.Euler( 0, 0, -CameraAnchor.transform.localRotation.eulerAngles.z ) * ( currentInput.normalized * currentInput.sqrMagnitude / maxInput ) , wingsAction.IsPressed () );
     }
 }

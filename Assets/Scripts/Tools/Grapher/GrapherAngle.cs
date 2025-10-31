@@ -6,17 +6,17 @@ public class GrapherAngle : Grapher {
     public Axis axis;
 
     public float delta;
-    public float pastDelta;
-    public int whatever;
+
+    public bool clamped;
 
     public override void Update () {
         delta = FlightCore.pastX;
         if ( axis == Axis.Z ) {
             delta = FlightCore.pastZ;
         }
+        if ( clamped ) { delta = Mathf.RoundToInt ( delta ) % 360; }
 
         data [ index ] = delta;
-        pastDelta = delta;
         base.Update ();
     }
 }

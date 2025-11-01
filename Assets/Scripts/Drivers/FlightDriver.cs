@@ -5,6 +5,7 @@ public class FlightDriver : MonoBehaviour {
     public FlightCore FlightCore;
     public InputActionAsset InputActions;
     public Anchor CameraAnchor;
+    public CameraStable CameraStable;
 
     private InputAction lookAction;
     private InputAction wingsAction;
@@ -74,7 +75,11 @@ public class FlightDriver : MonoBehaviour {
         if ( currentInput.magnitude > maxInput ) {
             currentInput = currentInput.normalized * maxInput;
         }
+        Vector2 omega = currentInput.normalized * currentInput.sqrMagnitude / maxInput;
+        if ( CameraStable.enabled ) {
+            omega = Quaternion.Euler ( 0 , 0 , -CameraAnchor.transform.localRotation.eulerAngles.z ) * omega;
+        }
 
-        FlightCore.UpdateInputs ( Quaternion.Euler( 0, 0, -CameraAnchor.transform.localRotation.eulerAngles.z ) * ( currentInput.normalized * currentInput.sqrMagnitude / maxInput ) , wingsAction.IsPressed () );
+        FlightCore.UpdateInputs ( omega , wingsAction.IsPressed () );
     }
 }

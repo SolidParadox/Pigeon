@@ -5,41 +5,46 @@ public class FlightDriver : MonoBehaviour {
     public FlightCore FlightCore;
     public InputActionAsset InputActions;
     public Anchor CameraAnchor;
-    public CameraStable CameraStable;
 
-    private InputAction lookAction;
-    private InputAction wingsAction;
+    private InputAction rightStickAction;
+    private InputAction leftStickAction;
+
+    private InputAction verticalAction;
+
     private InputAction releaseControl;
     private InputAction releaseCamera;
-    private InputAction resetPigeon;
 
     public bool inControl;
     public bool cameraControl;
 
     public Vector2 cameraSensitivityMultiplier;
 
-    public Vector2 currentInput;
-    public float maxInput;
+    public Vector2  transferLeft;
+    public Vector2  transferRight;
+    public float    transferVertical;
+    private int ticker;
+
+    ///  RIGHT --- IS ---> VIEW
+    ///  LEFT  --- IS --->  XY
 
     private void OnEnable () {
         inControl = true;
-        cameraControl = false;
-        currentInput = Vector2.zero;
 
-        var map = InputActions.FindActionMap("PigeonFlight");
+        var map = InputActions.FindActionMap("Player");
         map.Enable ();
 
-        wingsAction     = map.FindAction ( "PigeonWingFlap" );
-        lookAction      = map.FindAction ( "Look" );
-        releaseControl  = map.FindAction ( "ReleaseControl" );
-        releaseCamera   = map.FindAction ( "ReleaseCamera" );
-        resetPigeon     = map.FindAction ( "ResetPigeon" );
+        verticalAction = map.FindAction ( "Vertical" );
+        rightStickAction = map.FindAction ( "Look" );
+        leftStickAction = map.FindAction ( "Move" );
+        releaseControl = map.FindAction ( "TEMPReleaseControl" );
 
         Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
+
+        ticker = 0; transferRight = Vector2.zero; transferLeft = Vector2.zero;
     }
 
     private void OnDisable () {
-        InputActions.FindActionMap ( "PigeonFlight" ).Disable ();
+        InputActions.FindActionMap ( "Player" ).Disable ();
     }
 
     void Update () {
@@ -48,38 +53,46 @@ public class FlightDriver : MonoBehaviour {
             Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
         }
 
-        if ( resetPigeon.WasPressedThisDynamicUpdate () ) {
-            FlightCore.rgb.linearVelocity = Vector3.zero;
-            FlightCore.rgb.angularVelocity = Vector3.zero;
-            FlightCore.rgb.transform.position = Vector3.zero;
-            FlightCore.rgb.transform.rotation = Quaternion.identity;
+        if ( !inControl ) return;
+
+        if ( ticker == 0 ) {
+            transferLeft = Vector2.zero;
+            transferRight = Vector2.zero;
+            ticker = 0;
         }
 
-        if ( !inControl ) return;
-        
-        Vector2 lookDelta = lookAction.ReadValue<Vector2>() * Time.deltaTime;
+        Vector2 delta = leftStickAction.ReadValue<Vector2> ();
+        if ( delta.magnitude > 1 ) { delta.Normalize (); }
 
+        transferLeft += delta;
+
+        // WARNING : INPUT GETS OVERWHELMED WHEN USING MOUSE, should clamp at a different point for mouse only - fix later
+        delta = rightStickAction.ReadValue<Vector2> ();
+        if ( delta.magnitude > 1 ) { delta.Normalize (); }
+
+        transferRight += delta;
+
+        ticker++;
+
+        transferVertical += verticalAction.ReadValue<float> ();
+
+        /*
         if ( cameraControl != releaseCamera.IsPressed() ) {
             cameraControl = releaseCamera.IsPressed ();
             if ( !cameraControl ) {
                 CameraAnchor.angularInterpolationOffset = Vector3.zero;
             }
         }
+        */
+    }
 
-        if ( cameraControl ) {
-            lookDelta.Scale(cameraSensitivityMultiplier );
-            CameraAnchor.angularInterpolationOffset += new Vector3 ( -lookDelta.y, lookDelta.x, 0);
-            lookDelta = Vector2.zero;
-        }
-        currentInput += lookDelta; 
-        if ( currentInput.magnitude > maxInput ) {
-            currentInput = currentInput.normalized * maxInput;
-        }
-        Vector2 omega = currentInput.normalized * currentInput.sqrMagnitude / maxInput;
-        if ( CameraStable.enabled ) {
-            omega = Quaternion.Euler ( 0 , 0 , -CameraAnchor.transform.localRotation.eulerAngles.z ) * omega;
-        }
+    private void FixedUpdate () {
+        Vector2 deltaRight = transferRight, deltaLeft = transferLeft;
+        if ( ticker > 1 ) { deltaRight /= ticker; deltaLeft /= ticker; transferVertical /= ticker; }
 
-        FlightCore.UpdateInputs ( omega , wingsAction.IsPressed () );
+        // Anti lag system for dropped update frames
+        // Send information to the damn Core
+        FlightCore.RXinput ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , transferVertical );
+        ticker = 0;
     }
 }

@@ -10,10 +10,7 @@ public class GrapherAngle : Grapher {
     public bool clamped;
 
     public override void Update () {
-        delta = FlightCore.pastX;
-        if ( axis == Axis.Z ) {
-            delta = FlightCore.pastZ;
-        }
+        // TODO : Fix this with new flightcore
         if ( clamped ) { delta = Mathf.RoundToInt ( delta ) % 360; }
 
         data [ index ] = delta;

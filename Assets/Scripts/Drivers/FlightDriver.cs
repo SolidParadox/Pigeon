@@ -1,6 +1,23 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public struct FloatTransfer {
+    private float accumulator;
+    public void Add ( float input ) => accumulator += input;
+    public void TryReset ( int ticker ) {
+        if ( ticker == 0 ) accumulator = 0f;
+    }
+    public float GetValue ( int ticker ) => ticker > 0 ? accumulator / ticker : accumulator;
+}
+public struct Vector2Transfer {
+    private Vector2 accumulator;
+    public void Add ( Vector2 input ) => accumulator += input;
+    public void TryReset ( int ticker ) {
+        if ( ticker == 0 ) accumulator = Vector2.zero;
+    }
+    public Vector2 GetValue ( int ticker ) => ticker > 0 ? accumulator / ticker : accumulator;
+}
+
 public class FlightDriver : MonoBehaviour {
     public FlightCore FlightCore;
     public InputActionAsset InputActions;
@@ -8,24 +25,19 @@ public class FlightDriver : MonoBehaviour {
 
     private InputAction rightStickAction;
     private InputAction leftStickAction;
-
     private InputAction verticalAction;
-
     private InputAction releaseControl;
     private InputAction releaseCamera;
 
     public bool inControl;
     public bool cameraControl;
-
     public Vector2 cameraSensitivityMultiplier;
 
-    public Vector2  transferLeft;
-    public Vector2  transferRight;
-    public float    transferVertical;
-    private int ticker;
+    private Vector2Transfer transferLeft;
+    private Vector2Transfer transferRight;
+    private FloatTransfer transferVertical;
 
-    ///  RIGHT --- IS ---> VIEW
-    ///  LEFT  --- IS --->  XY
+    private int ticker;
 
     private void OnEnable () {
         inControl = true;
@@ -40,7 +52,7 @@ public class FlightDriver : MonoBehaviour {
 
         Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
 
-        ticker = 0; transferRight = Vector2.zero; transferLeft = Vector2.zero;
+        ticker = 0;
     }
 
     private void OnDisable () {
@@ -55,44 +67,30 @@ public class FlightDriver : MonoBehaviour {
 
         if ( !inControl ) return;
 
-        if ( ticker == 0 ) {
-            transferLeft = Vector2.zero;
-            transferRight = Vector2.zero;
-            ticker = 0;
-        }
+        transferLeft.TryReset ( ticker );
+        transferRight.TryReset ( ticker );
+        transferVertical.TryReset ( ticker );
 
-        Vector2 delta = leftStickAction.ReadValue<Vector2> ();
-        if ( delta.magnitude > 1 ) { delta.Normalize (); }
+        Vector2 delta = leftStickAction.ReadValue<Vector2>();
+        if ( delta.magnitude > 1 ) delta.Normalize ();
+        transferLeft.Add ( delta );
 
-        transferLeft += delta;
-
-        // WARNING : INPUT GETS OVERWHELMED WHEN USING MOUSE, should clamp at a different point for mouse only - fix later
         delta = rightStickAction.ReadValue<Vector2> ();
-        if ( delta.magnitude > 1 ) { delta.Normalize (); }
+        if ( delta.magnitude > 1 ) delta.Normalize ();
+        transferRight.Add ( delta );
 
-        transferRight += delta;
+        transferVertical.Add ( verticalAction.ReadValue<float> () );
 
         ticker++;
-
-        transferVertical += verticalAction.ReadValue<float> ();
-
-        /*
-        if ( cameraControl != releaseCamera.IsPressed() ) {
-            cameraControl = releaseCamera.IsPressed ();
-            if ( !cameraControl ) {
-                CameraAnchor.angularInterpolationOffset = Vector3.zero;
-            }
-        }
-        */
     }
 
     private void FixedUpdate () {
-        Vector2 deltaRight = transferRight, deltaLeft = transferLeft;
-        if ( ticker > 1 ) { deltaRight /= ticker; deltaLeft /= ticker; transferVertical /= ticker; }
+        Vector2 deltaRight = transferRight.GetValue(ticker);
+        Vector2 deltaLeft = transferLeft.GetValue(ticker);
+        float deltaVertical = transferVertical.GetValue(ticker);
 
-        // Anti lag system for dropped update frames
-        // Send information to the damn Core
-        FlightCore.RXinput ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , transferVertical );
+        FlightCore.RXinput ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , deltaVertical );
+
         ticker = 0;
     }
 }

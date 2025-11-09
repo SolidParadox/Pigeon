@@ -19,7 +19,16 @@ public struct Vector2Transfer {
 }
 
 public class FlightDriver : MonoBehaviour {
-    public FlightCore FlightCore;
+    public FlightCore FlightCoreFlight;
+    public FlightCore FlightCoreBoost;
+    public FlightCore FlightCore {
+        get {
+            return transferBoost.GetValue( ticker ) > 0 ? FlightCoreBoost : FlightCoreFlight;
+        }
+    }
+
+    public DodgeCore  DodgeCore;
+
     public InputActionAsset InputActions;
     public Anchor CameraAnchor;
 
@@ -28,16 +37,33 @@ public class FlightDriver : MonoBehaviour {
     private InputAction verticalAction;
     private InputAction releaseControl;
     private InputAction releaseCamera;
+    private InputAction boostAction;
 
     public bool inControl;
     public bool cameraControl;
     public Vector2 cameraSensitivityMultiplier;
 
+    public Celll Celll;
+    public float STRBoostCellDrain;
+    public float STRDodgeCost;
+
     private Vector2Transfer transferLeft;
     private Vector2Transfer transferRight;
     private FloatTransfer transferVertical;
+    private FloatTransfer transferBoost;
+
+    private bool boostInterdiction = false;
 
     private int ticker;
+
+    private float dodgeHack;
+    private bool dodgeCatch;
+    public float THRDodgeWindow;
+
+    public void SetBoostInterdiction ( bool alpha ) {
+        // We might need to trigger things on change, that's why im using a function
+        boostInterdiction = alpha;
+    }
 
     private void OnEnable () {
         inControl = true;
@@ -49,9 +75,12 @@ public class FlightDriver : MonoBehaviour {
         rightStickAction = map.FindAction ( "Look" );
         leftStickAction = map.FindAction ( "Move" );
         releaseControl = map.FindAction ( "TEMPReleaseControl" );
+        boostAction = map.FindAction ( "Boost" );
 
         Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
 
+        dodgeHack = 0;
+        dodgeCatch = false;
         ticker = 0;
     }
 
@@ -60,6 +89,8 @@ public class FlightDriver : MonoBehaviour {
     }
 
     void Update () {
+        Debug.Log ( dodgeHack + " " + dodgeCatch );
+
         if ( releaseControl.WasPressedThisDynamicUpdate () ) {
             inControl = !inControl;
             Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
@@ -67,20 +98,45 @@ public class FlightDriver : MonoBehaviour {
 
         if ( !inControl ) return;
 
+        dodgeHack -= Time.deltaTime;
+        if ( dodgeHack < 0 ) dodgeHack = 0;
+
         transferLeft.TryReset ( ticker );
         transferRight.TryReset ( ticker );
         transferVertical.TryReset ( ticker );
+        transferBoost.TryReset ( ticker );
 
         Vector2 delta = leftStickAction.ReadValue<Vector2>();
         if ( delta.magnitude > 1 ) delta.Normalize ();
         transferLeft.Add ( delta );
+
+        // Boost control
+        if ( boostAction.IsPressed () ) {
+            bool hasDodged = false;
+            if ( !dodgeCatch ) {
+                if ( dodgeHack > 0 && !DodgeCore.isDodging && Celll.Drain ( STRDodgeCost ) ) {
+                    if ( delta.magnitude < 0.1f ) {
+                        delta = Vector2.up;
+                    }
+                    DodgeCore.RXRelative ( new Vector3 ( delta.x , 0 , delta.y ) );
+                    hasDodged = true;
+                }
+                dodgeHack = THRDodgeWindow;
+                dodgeCatch = false;
+            }
+            if ( !hasDodged && !DodgeCore.isDodging && Celll.Drain ( STRBoostCellDrain * Time.deltaTime ) ) {
+                transferBoost.Add ( 1 );
+            }
+        } else {
+            dodgeCatch = false;
+        }
 
         delta = rightStickAction.ReadValue<Vector2> ();
         if ( delta.magnitude > 1 ) delta.Normalize ();
         transferRight.Add ( delta );
 
         transferVertical.Add ( verticalAction.ReadValue<float> () );
-
+      
         ticker++;
     }
 
@@ -97,8 +153,17 @@ public class FlightDriver : MonoBehaviour {
         Vector2 deltaRight = transferRight.GetValue(ticker);
         Vector2 deltaLeft = transferLeft.GetValue(ticker);
         float deltaVertical = transferVertical.GetValue(ticker);
-
-        FlightCore.RXinput ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , deltaVertical );
+        
+        if ( transferBoost.GetValue( ticker ) > 0 ) {
+            FlightCoreBoost.enabled = true && !boostInterdiction;
+            FlightCoreFlight.enabled = false;
+            FlightCoreBoost.RX ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , deltaVertical );
+        } else {
+            FlightCoreFlight.enabled = true && !boostInterdiction;
+            FlightCoreBoost.enabled = false;
+            FlightCoreFlight.RX ( new Vector3 ( deltaLeft.x , deltaRight.x , deltaLeft.y ) , deltaVertical );
+        }
+        FlightCoreBoost.Boost ();
 
         ticker = 0;
     }

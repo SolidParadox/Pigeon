@@ -21,7 +21,7 @@ public class FlightCore : MonoBehaviour {
         verticalPassVar = 0;
     }
 
-    public void RXinput( Vector3 alphaCombined, float alphaVertical, int priority = 0 ) {
+    public void RX( Vector3 alphaCombined, float alphaVertical, int priority = 0 ) {
         if ( priority >= passPrio ) {
             mainPassVar = alphaCombined;
             verticalPassVar = alphaVertical;

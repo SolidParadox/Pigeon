@@ -5,7 +5,9 @@ public class HUDManager : MonoBehaviour {
     public Celll    Celll;
     public Slider   Slider;
 
+    public Color alpha, beta;
+
     public void LateUpdate () {
-        Slider.value = Celll.GetAvailableLoad ();
+        Slider.value = Celll.resourceCurrent / Celll.resourceMax;
     }
 }

@@ -84,6 +84,15 @@ public class FlightDriver : MonoBehaviour {
         ticker++;
     }
 
+    private void LateUpdate () {
+        if ( inControl ) {
+            CameraAnchor.angularInterpolationOffset.x -= rightStickAction.ReadValue<Vector2> ().y * cameraSensitivityMultiplier.y * Time.deltaTime;
+            if ( Mathf.Abs ( CameraAnchor.angularInterpolationOffset.x ) > 90 ) {
+                CameraAnchor.angularInterpolationOffset.x = Mathf.Sign ( CameraAnchor.angularInterpolationOffset.x ) * 90;
+            }
+        }
+    }
+
     private void FixedUpdate () {
         Vector2 deltaRight = transferRight.GetValue(ticker);
         Vector2 deltaLeft = transferLeft.GetValue(ticker);

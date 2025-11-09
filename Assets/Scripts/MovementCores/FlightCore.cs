@@ -5,6 +5,9 @@ public class FlightCore : MonoBehaviour {
 
     public Vector3 STRMultipliers;
     public float STRMultipliersVertical;
+    
+    public float STRExpoDrag;
+
     public float THRSpeed;
     public float THRSpeedVertical;
     public AnimationCurve FNCAcc;
@@ -34,7 +37,11 @@ public class FlightCore : MonoBehaviour {
 
         rgb.MoveRotation ( rgb.rotation * Quaternion.Euler ( 0 , mainPassVar.y , 0 ) );
 
-        Vector3 xyVel = rgb.transform.InverseTransformDirection ( rgb.linearVelocity );
+        Vector3 xyVel = rgb.linearVelocity;
+        xyVel -= xyVel.normalized * xyVel.sqrMagnitude * STRExpoDrag;
+        rgb.linearVelocity = xyVel;
+
+        xyVel = rgb.transform .InverseTransformDirection ( xyVel );
         Vector3 xyAcc = new Vector3 ( mainPassVar.x, 0, mainPassVar.z ) * Time.fixedDeltaTime;
 
         Vector3 accumulator = Vector3.zero;

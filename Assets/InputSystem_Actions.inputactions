@@ -455,10 +455,10 @@
                 {
                     "name": "",
                     "id": "7deffbe4-9402-45db-9bf7-8ee9721199cb",
-                    "path": "",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse;Joystick",
                     "action": "TEMPReleaseControl",
                     "isComposite": false,
                     "isPartOfComposite": false

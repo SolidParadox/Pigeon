@@ -1547,31 +1547,97 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlightCore
   rgb: {fileID: 2124858609}
-  STRMultipliers: {x: 10, y: 3, z: 15}
-  STRMultipliersVertical: 5
-  STRExpoDrag: 0.001
+  STRMultipliers: {x: 10, y: 3, z: 20}
+  STRMultipliersVertical: 10
+  STRExpoDrag: 0.002
   THRSpeed: 15
   THRSpeedVertical: 5
-  FNCAcc:
+  FNCAccForward:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 4
-      inSlope: 0.002217966
-      outSlope: 0.002217966
+      time: -0.006088257
+      value: 1
+      inSlope: 0.004808156
+      outSlope: 0.004808156
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 1
     - serializedVersion: 3
       time: 1
-      value: 1
-      inSlope: -7.0178804
-      outSlope: -7.0178804
+      value: 2
+      inSlope: 0.0014015969
+      outSlope: 0.0014015969
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.121022284
+      inWeight: 0.33333334
+      outWeight: 1
+    - serializedVersion: 3
+      time: 2
+      value: 0.5079723
+      inSlope: 0.0030648592
+      outSlope: 0
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.5079723
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  FNCAccLateral:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0.006467453
+      outSlope: 0.006467453
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.99829936
+    - serializedVersion: 3
+      time: 1.5
+      value: 4
+      inSlope: -0.015380957
+      outSlope: -0.015380957
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  FNCAntigravity:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -2299,27 +2365,21 @@ MonoBehaviour:
   STRExpoDrag: 0
   THRSpeed: 20
   THRSpeedVertical: 2
-  FNCAcc:
+  FNCAccForward:
     serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.5
-      inSlope: -2.5952947
-      outSlope: -2.5952947
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.17659509
-    - serializedVersion: 3
-      time: 1
-      value: 3
-      inSlope: 0.011129431
-      outSlope: 0.011129431
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.9979816
-      outWeight: 0
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  FNCAccLateral:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  FNCAntigravity:
+    serializedVersion: 2
+    m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -6242,9 +6302,9 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 1
 --- !u!1001 &2147250876

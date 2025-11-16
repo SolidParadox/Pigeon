@@ -35,7 +35,7 @@ public class DodgeCore : MonoBehaviour {
         rgb.linearVelocity = direction * dodgeSpeed;
         while ( timer > 0 ) {
             timer -= Time.fixedDeltaTime;
-            // If we hit something we wont return to the same speed
+            // If we hit something we wont return to the same speed ( and possibly bounce / land )
             yield return new WaitForFixedUpdate ();
         }
         

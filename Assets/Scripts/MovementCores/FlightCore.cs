@@ -10,7 +10,10 @@ public class FlightCore : MonoBehaviour {
 
     public float THRSpeed;
     public float THRSpeedVertical;
-    public AnimationCurve FNCAcc;
+    public AnimationCurve FNCAccForward;
+    public AnimationCurve FNCAccLateral;
+
+    public AnimationCurve FNCAntigravity;
 
     private int   passPrio = 0;
     private Vector3 mainPassVar;
@@ -42,7 +45,7 @@ public class FlightCore : MonoBehaviour {
         rgb.linearVelocity = xyVel;
 
         xyVel = rgb.transform .InverseTransformDirection ( xyVel );
-        Vector3 xyAcc = new Vector3 ( mainPassVar.x, 0, mainPassVar.z ) * Time.fixedDeltaTime;
+        Vector3 xyAcc = new Vector3 ( mainPassVar.x, 0, mainPassVar.z );
 
         Vector3 accumulator = Vector3.zero;
 
@@ -50,11 +53,12 @@ public class FlightCore : MonoBehaviour {
 
         xyVel.y = 0;
 
-        xyAcc.x *= FNCAcc.Evaluate ( xyVel.x / THRSpeed );
-        xyAcc.z *= FNCAcc.Evaluate ( xyVel.z / THRSpeed );
+        xyAcc.x *= FNCAccForward.Evaluate ( xyVel.x / THRSpeed );
+        xyAcc.z *= FNCAccLateral.Evaluate ( xyVel.z / THRSpeed );
 
-        accumulator += MIKA ( xyAcc , xyVel , THRSpeed );
+        accumulator += MIKA ( xyAcc * Time.fixedDeltaTime , xyVel , THRSpeed );
         rgb.AddRelativeForce ( accumulator , ForceMode.VelocityChange );
+        rgb.AddForce ( -Physics.gravity * FNCAntigravity.Evaluate( xyVel.magnitude / THRSpeed ), ForceMode.Acceleration );
 
         mainPassVar = Vector3.zero;
         passPrio = 0;

@@ -88,23 +88,28 @@ public class FlightDriver : MonoBehaviour {
         InputActions.FindActionMap ( "Player" ).Disable ();
     }
 
+    public void TryResetAllTransfers( int _ticker ) {
+        transferLeft.TryReset ( _ticker );
+        transferRight.TryReset ( _ticker );
+        transferVertical.TryReset ( _ticker );
+        transferBoost.TryReset ( _ticker );
+    }
+         
     void Update () {
-        Debug.Log ( dodgeHack + " " + dodgeCatch );
-
         if ( releaseControl.WasPressedThisDynamicUpdate () ) {
             inControl = !inControl;
             Cursor.lockState = inControl ? CursorLockMode.Locked : CursorLockMode.None;
         }
 
-        if ( !inControl ) return;
+        if ( !inControl ) {
+            TryResetAllTransfers ( 0 );
+            return;
+        }
 
         dodgeHack -= Time.deltaTime;
         if ( dodgeHack < 0 ) dodgeHack = 0;
 
-        transferLeft.TryReset ( ticker );
-        transferRight.TryReset ( ticker );
-        transferVertical.TryReset ( ticker );
-        transferBoost.TryReset ( ticker );
+        TryResetAllTransfers ( ticker );
 
         Vector2 delta = leftStickAction.ReadValue<Vector2>();
         if ( delta.magnitude > 1 ) delta.Normalize ();
@@ -122,7 +127,7 @@ public class FlightDriver : MonoBehaviour {
                     hasDodged = true;
                 }
                 dodgeHack = THRDodgeWindow;
-                dodgeCatch = false;
+                dodgeCatch = true;
             }
             if ( !hasDodged && !DodgeCore.isDodging && Celll.Drain ( STRBoostCellDrain * Time.deltaTime ) ) {
                 transferBoost.Add ( 1 );
